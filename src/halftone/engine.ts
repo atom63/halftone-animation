@@ -117,10 +117,10 @@ export function dotColor(amp: number, isDark: boolean): string {
     return `oklch(${l} ${c} ${h} / ${a})`
   }
   // light mode: burnt-orange → amber ramp — dark dots on ivory ground
-  const l = (0.70 - amp * 0.28).toFixed(3)
-  const c = (0.03 + amp * 0.18).toFixed(3)
+  const l = (0.62 - amp * 0.26).toFixed(3)
+  const c = (0.05 + amp * 0.19).toFixed(3)
   const h = (62 - amp * 20).toFixed(1)
-  const a = Math.min(1, 0.05 + amp * 0.95).toFixed(3)
+  const a = Math.min(1, 0.18 + amp * 0.82).toFixed(3)
   return `oklch(${l} ${c} ${h} / ${a})`
 }
 
