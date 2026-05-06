@@ -9,7 +9,7 @@ interface InstrumentStripProps {
 
 export function InstrumentStrip({ dark, githubUrl, onToggleDark, readouts }: InstrumentStripProps) {
   return (
-    <div className="i-strip">
+    <footer className="i-strip">
       <style>{styles}</style>
 
       <span className="i-strip-label">HALFTONE ANIMATION</span>
@@ -50,7 +50,7 @@ export function InstrumentStrip({ dark, githubUrl, onToggleDark, readouts }: Ins
           {dark ? '○' : '◐'}
         </button>
       </div>
-    </div>
+    </footer>
   )
 }
 
