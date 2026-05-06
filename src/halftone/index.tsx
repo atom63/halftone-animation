@@ -287,6 +287,7 @@ interface FrameParams {
   dtFrames: number
   /** Eased entry-stage progress (0 during radial reveal, 1 when settled into idle). */
   entry: number
+  isDark: boolean
   lH: number
   lW: number
   t: number
@@ -558,12 +559,13 @@ function drawBaseDot(
   amp: number,
   dotMin: number,
   dotMax: number,
-  jitter: number
+  jitter: number,
+  isDark: boolean
 ): void {
   const radius = (dotMin + amp * (dotMax - dotMin)) * jitter
   ctx.beginPath()
   ctx.arc(x, y, radius, 0, Math.PI * 2)
-  ctx.fillStyle = dotColor(amp)
+  ctx.fillStyle = dotColor(amp, isDark)
   ctx.fill()
 }
 
@@ -577,14 +579,15 @@ function drawTrailDot(
   t: number,
   dotMin: number,
   dotMax: number,
-  jitter: number
+  jitter: number,
+  isDark: boolean
 ): void {
   const nRaw = noiseVal(nx * 4.5, ny * 4.5, t * 0.35) * 0.5 + 0.5
   const nMod = 0.3 + nRaw * 1.5
   const radius = (dotMin + tAmp * (dotMax - dotMin)) * jitter * nMod
   ctx.beginPath()
   ctx.arc(x, y, radius, 0, Math.PI * 2)
-  ctx.fillStyle = trailDotColor(tAmp)
+  ctx.fillStyle = trailDotColor(tAmp, isDark)
   ctx.fill()
 }
 
@@ -664,13 +667,13 @@ function drawSettledDot(
 
   const jitter = 0.65 + dotHash(col, row) * 0.35
   if (amp >= 0.012) {
-    drawBaseDot(ctx, x, y, amp, dotMin, dotMax, jitter)
+    drawBaseDot(ctx, x, y, amp, dotMin, dotMax, jitter, frame.isDark)
   }
   if (interactAmp > 0.01) {
-    drawTrailDot(ctx, x, y, interactAmp, nx, ny, t, dotMin, dotMax, jitter)
+    drawTrailDot(ctx, x, y, interactAmp, nx, ny, t, dotMin, dotMax, jitter, frame.isDark)
   }
   if (sqAmp >= 0.012) {
-    drawBaseDot(ctx, x, y, Math.min(1, sqAmp ** 0.4), shapeDotMin, shapeDotMax, jitter)
+    drawBaseDot(ctx, x, y, Math.min(1, sqAmp ** 0.4), shapeDotMin, shapeDotMax, jitter, frame.isDark)
   }
 }
 
@@ -739,13 +742,13 @@ function drawEntryStageDot(
 
   const jitter = 0.65 + hash * 0.35
   if (amp >= 0.012) {
-    drawBaseDot(ctx, x, y, amp, dotMin, dotMax, jitter)
+    drawBaseDot(ctx, x, y, amp, dotMin, dotMax, jitter, frame.isDark)
   }
   if (interactAmp > 0.01) {
-    drawTrailDot(ctx, x, y, interactAmp, nx, ny, t, dotMin, dotMax, jitter)
+    drawTrailDot(ctx, x, y, interactAmp, nx, ny, t, dotMin, dotMax, jitter, frame.isDark)
   }
   if (sqAmp >= 0.012) {
-    drawBaseDot(ctx, x, y, Math.min(1, sqAmp ** 0.4), shapeDotMin, shapeDotMax, jitter)
+    drawBaseDot(ctx, x, y, Math.min(1, sqAmp ** 0.4), shapeDotMin, shapeDotMax, jitter, frame.isDark)
   }
 }
 
@@ -762,7 +765,7 @@ function drawWavefrontDot(
   }
   const { dotMin, dotMax } = frame.c.grid
   const jitter = 0.65 + dotHash(col, row) * 0.35
-  drawBaseDot(ctx, coords.x, coords.y, Math.min(1, mod.wavefront), dotMin, dotMax, jitter)
+  drawBaseDot(ctx, coords.x, coords.y, Math.min(1, mod.wavefront), dotMin, dotMax, jitter, frame.isDark)
 }
 
 function drawGridCell(
@@ -1006,6 +1009,7 @@ export function Halftone({ canvasCssVar = 'var(--background)', onReadout }: Half
         t: timeRef.current,
         dtFrames,
         entry: easeOutQuart(entryRawRef.current),
+        isDark: document.documentElement.classList.contains('dark'),
       }
 
       advanceArrays(dtFrames)
