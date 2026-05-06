@@ -16,7 +16,7 @@ export default function App() {
   }, [dark])
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: 'var(--background)' }}>
       <main
         aria-label="Halftone animation canvas"
         style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}
