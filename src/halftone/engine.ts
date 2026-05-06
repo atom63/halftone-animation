@@ -43,87 +43,7 @@ const HALFTONE_BG_FALLBACK: HalftoneBgGradientStops = {
   fill: 'rgb(255, 255, 255)',
 }
 
-/** Default halftone dot tint if `--foreground` cannot be resolved (SSR, etc.). */
-const HALFTONE_DOT_RGB_FALLBACK: readonly [number, number, number] = [28, 28, 28]
-
-const CSS_RGB_COMMAS = /^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)/
-const CSS_RGB_SPACES = /^rgba?\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*[\d.]+%?)?\s*\)$/i
-const CSS_HEX = /^#([\da-f]{3}|[\da-f]{6})\b/i
-
-let halftoneColorParseCtx: CanvasRenderingContext2D | null = null
-
 let halftoneBgProbe: HTMLDivElement | null = null
-
-let halftoneDotRgb: readonly [number, number, number] = HALFTONE_DOT_RGB_FALLBACK
-
-function parseCssRgbTriplet(css: string): { r: number; g: number; b: number } | null {
-  const comma = CSS_RGB_COMMAS.exec(css)
-  if (comma) {
-    return { r: Number(comma[1]), g: Number(comma[2]), b: Number(comma[3]) }
-  }
-  const space = CSS_RGB_SPACES.exec(css.trim())
-  if (space) {
-    return { r: Number(space[1]), g: Number(space[2]), b: Number(space[3]) }
-  }
-  const hex = CSS_HEX.exec(css.trim())
-  if (hex) {
-    const s = hex[1]
-    if (s.length === 3) {
-      return {
-        r: Number.parseInt(s[0] + s[0], 16),
-        g: Number.parseInt(s[1] + s[1], 16),
-        b: Number.parseInt(s[2] + s[2], 16),
-      }
-    }
-    return {
-      r: Number.parseInt(s.slice(0, 2), 16),
-      g: Number.parseInt(s.slice(2, 4), 16),
-      b: Number.parseInt(s.slice(4, 6), 16),
-    }
-  }
-  return null
-}
-
-/**
- * `getComputedStyle` often returns `oklch()` / `color()` for themed tokens; canvas `fillStyle`
- * round-trips those to `rgb()` / `#rrggbb` so we can drive `rgba()` dots reliably.
- */
-function normalizeCssColorToRgbSerial(css: string): string | null {
-  if (typeof document === 'undefined') {
-    return null
-  }
-  if (!halftoneColorParseCtx) {
-    const c = document.createElement('canvas')
-    c.width = 1
-    c.height = 1
-    halftoneColorParseCtx = c.getContext('2d')
-  }
-  const ctx = halftoneColorParseCtx
-  if (!ctx) {
-    return null
-  }
-  const sentinel = '#ff00ff'
-  ctx.fillStyle = sentinel
-  const sentinelResolved = ctx.fillStyle
-  ctx.fillStyle = css
-  const out = ctx.fillStyle
-  if (out === sentinelResolved) {
-    return null
-  }
-  return typeof out === 'string' ? out : null
-}
-
-function parseCssColorToRgbTriplet(css: string): { r: number; g: number; b: number } | null {
-  const direct = parseCssRgbTriplet(css)
-  if (direct) {
-    return direct
-  }
-  const viaCanvas = normalizeCssColorToRgbSerial(css)
-  if (!viaCanvas) {
-    return null
-  }
-  return parseCssRgbTriplet(viaCanvas)
-}
 
 function resolveSemanticBgColor(cssBackground: string): string {
   if (typeof document === 'undefined') {
@@ -142,19 +62,6 @@ function resolveSemanticBgColor(cssBackground: string): string {
     return HALFTONE_BG_FALLBACK.fill
   }
   return rgb
-}
-
-/**
- * Re-read dot ink from the document root. Pass any CSS color that resolves on `<html>` — typically
- * `var(--foreground)` or `var(--primary)` from `semantics.css` (`.dark`, `data-ui-theme`, etc.).
- * Uses the same probe + `oklch` normalization path as the canvas fill.
- */
-export function syncHalftoneDotColorFromSemantics(cssBackgroundValue = 'var(--foreground)'): void {
-  const resolved = resolveSemanticBgColor(cssBackgroundValue)
-  const triplet = parseCssColorToRgbTriplet(resolved)
-  if (triplet) {
-    halftoneDotRgb = [triplet.r, triplet.g, triplet.b] as const
-  }
 }
 
 /**
@@ -200,17 +107,21 @@ export function noiseVal(x: number, y: number, t: number): number {
   )
 }
 
+// Chromatic ramp: deep prussian → rich cobalt → electric blue by amplitude.
 export function dotColor(amp: number): string {
-  const [r0, g0, b0] = halftoneDotRgb
-  const a = Math.min(1, 0.04 + amp * 0.96)
-  return `rgba(${r0},${g0},${b0},${a})`
+  const l = (0.1 + amp * 0.62).toFixed(3)
+  const c = (0.04 + amp * 0.26).toFixed(3)
+  const h = (265 - amp * 13).toFixed(1)
+  const a = Math.min(1, 0.05 + amp * 0.95).toFixed(3)
+  return `oklch(${l} ${c} ${h} / ${a})`
 }
 
-/** Cursor / hover trail overlay: same `--foreground` RGB as halftone dots, brighter alpha curve. */
+// Phosphor-bright cool white — contrasts with the blue field on hover.
 export function trailDotColor(tAmp: number): string {
-  const [r0, g0, b0] = halftoneDotRgb
-  const a = Math.min(1, 0.15 + tAmp * 0.8)
-  return `rgba(${r0},${g0},${b0},${a})`
+  const l = (0.6 + tAmp * 0.32).toFixed(3)
+  const c = (0.04 + tAmp * 0.1).toFixed(3)
+  const a = Math.min(1, 0.15 + tAmp * 0.85).toFixed(3)
+  return `oklch(${l} ${c} 215 / ${a})`
 }
 
 export function easeIn3(t: number): number {

@@ -7,27 +7,29 @@
 :root {
   color-scheme: light;
 
-  --background: #ffffff;
-  --foreground: #1c1c1c;
-  --border: rgba(0, 0, 0, 0.1);
-  --muted-foreground: rgba(0, 0, 0, 0.42);
-  --ring: rgba(0, 0, 0, 0.22);
+  --font-mono: 'DM Mono', ui-monospace, 'Cascadia Code', 'SF Mono', monospace;
 
-  --header-bg: rgba(255, 255, 255, 0.88);
-  --header-border: rgba(0, 0, 0, 0.07);
+  --background: oklch(0.97 0.008 264);
+  --foreground: oklch(0.12 0.04 264);
+  --border: oklch(0.12 0.04 264 / 0.1);
+  --muted-foreground: oklch(0.12 0.04 264 / 0.4);
+  --ring: oklch(0.52 0.22 258 / 0.4);
+
+  --header-bg: oklch(0.97 0.008 264 / 0.92);
+  --header-border: oklch(0.12 0.04 264 / 0.07);
 }
 
 html.dark {
   color-scheme: dark;
 
-  --background: #0a0a0a;
-  --foreground: #f0f0f0;
-  --border: rgba(255, 255, 255, 0.1);
-  --muted-foreground: rgba(255, 255, 255, 0.42);
-  --ring: rgba(255, 255, 255, 0.22);
+  --background: oklch(0.07 0.02 264);
+  --foreground: oklch(0.92 0.015 264);
+  --border: oklch(0.92 0.015 264 / 0.08);
+  --muted-foreground: oklch(0.92 0.015 264 / 0.36);
+  --ring: oklch(0.65 0.24 255 / 0.45);
 
-  --header-bg: rgba(10, 10, 10, 0.88);
-  --header-border: rgba(255, 255, 255, 0.06);
+  --header-bg: oklch(0.07 0.02 264 / 0.94);
+  --header-border: oklch(0.58 0.2 258 / 0.16);
 }
 
 html,

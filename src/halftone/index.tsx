@@ -78,7 +78,6 @@ import {
   spawnOutCell,
   spawnSquare,
   squarePhase,
-  syncHalftoneDotColorFromSemantics,
   trailDotColor,
 } from './engine'
 import type {
@@ -814,20 +813,10 @@ function prefersReducedMotion(): boolean {
 export interface HalftoneProps {
   /** Backdrop fill for the offscreen bitmap. Default `var(--background)`. */
   canvasCssVar?: string
-  /**
-   * CSS color assigned to the probe’s `backgroundColor` (same as theme tokens on `<html>`).
-   * Example: `var(--foreground)`, `var(--primary)`, `var(--muted-foreground)`.
-   */
-  dotCssVar?: string
 }
 
-export function Halftone({
-  dotCssVar = 'var(--foreground)',
-  canvasCssVar = 'var(--background)',
-}: HalftoneProps = {}) {
-  const semanticDotVarRef = useRef(dotCssVar)
+export function Halftone({ canvasCssVar = 'var(--background)' }: HalftoneProps = {}) {
   const semanticCanvasVarRef = useRef(canvasCssVar)
-  semanticDotVarRef.current = dotCssVar
   semanticCanvasVarRef.current = canvasCssVar
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -896,11 +885,10 @@ export function Halftone({
     }
   }, [])
 
-  // Re-resolve colors when MDX/site passes different `dotCssVar` / `canvasCssVar`.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: props must invalidate the cached bitmap
+  // biome-ignore lint/correctness/useExhaustiveDependencies: prop must invalidate the cached bitmap
   useEffect(() => {
     bgBufferRef.current = null
-  }, [dotCssVar, canvasCssVar])
+  }, [canvasCssVar])
 
   // Replay just re-triggers the entry animation from scratch — cells, squares,
   // trail, clocks all zero'd — while preserving any user-tweaked dial values.
@@ -983,7 +971,6 @@ export function Halftone({
     if (bgBufferRef.current && cur.w === lW && cur.h === lH) {
       return
     }
-    syncHalftoneDotColorFromSemantics(semanticDotVarRef.current)
     const stops = resolveHalftoneBgStopsFromSemantics(semanticCanvasVarRef.current)
     bgBufferRef.current = buildBackgroundBuffer(lW, lH, stops)
     bgSizeRef.current = { w: lW, h: lH }
