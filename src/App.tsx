@@ -19,9 +19,20 @@ export default function App() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: 'var(--background)' }}>
       <main
         aria-label="Halftone animation canvas"
-        style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}
+        style={{ flex: 1, minHeight: 0, overflow: 'hidden', position: 'relative' }}
       >
-        <Halftone onReadout={setReadouts} />
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            height: '100%',
+            aspectRatio: '1',
+          }}
+        >
+          <Halftone onReadout={setReadouts} />
+        </div>
       </main>
       <InstrumentStrip
         dark={dark}
