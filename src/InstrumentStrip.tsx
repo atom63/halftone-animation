@@ -38,7 +38,7 @@ export function InstrumentStrip({ dark, githubUrl, onToggleDark, readouts }: Ins
           aria-label="View source on GitHub"
           title="View source on GitHub"
         >
-          SRC
+          GIT
         </a>
         <button
           type="button"
