@@ -1,5 +1,7 @@
 # halftone animation
 
+**[halftone.atom63.io](https://halftone.atom63.io)**
+
 An animated halftone dot field rendered on a `<canvas>` — with a live parameter panel to tweak everything in real time.
 
 By [You Zhang](https://atom63.io) · [ATOM63](https://github.com/atom63)
