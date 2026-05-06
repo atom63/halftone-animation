@@ -48,7 +48,7 @@ export default function App() {
             fontFamily: 'system-ui, sans-serif',
           }}
         >
-          halftone
+          halftone animation
         </span>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -74,8 +74,26 @@ export default function App() {
         </div>
       </header>
 
-      <main style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
-        <Halftone />
+      <main
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <div
+          style={{
+            width: 'min(100%, calc(100dvh - 48px))',
+            aspectRatio: '1',
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+        >
+          <Halftone />
+        </div>
       </main>
     </div>
   )
