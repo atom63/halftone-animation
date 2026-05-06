@@ -109,33 +109,30 @@ export function noiseVal(x: number, y: number, t: number): number {
 
 // Chromatic ramp: deep prussian → rich cobalt → electric blue by amplitude.
 export function dotColor(amp: number, isDark: boolean): string {
+  // amber → burnt-orange hue ramp, tuned per background direction
+  const h = (62 - amp * 20).toFixed(1)
+  const c = (0.05 + amp * 0.19).toFixed(3)
   if (isDark) {
-    const l = (0.1 + amp * 0.62).toFixed(3)
-    const c = (0.04 + amp * 0.26).toFixed(3)
-    const h = (265 - amp * 13).toFixed(1)
+    // dim → bright glow on dark ground
+    const l = (0.15 + amp * 0.52).toFixed(3)
     const a = Math.min(1, 0.05 + amp * 0.95).toFixed(3)
     return `oklch(${l} ${c} ${h} / ${a})`
   }
-  // light mode: burnt-orange → amber ramp — dark dots on ivory ground
+  // dark dots fade in on ivory ground
   const l = (0.62 - amp * 0.26).toFixed(3)
-  const c = (0.05 + amp * 0.19).toFixed(3)
-  const h = (62 - amp * 20).toFixed(1)
   const a = Math.min(1, 0.18 + amp * 0.82).toFixed(3)
   return `oklch(${l} ${c} ${h} / ${a})`
 }
 
 export function trailDotColor(tAmp: number, isDark: boolean): string {
-  if (isDark) {
-    // phosphor-bright cool white — contrasts with the blue field on hover
-    const l = (0.6 + tAmp * 0.32).toFixed(3)
-    const c = (0.04 + tAmp * 0.1).toFixed(3)
-    const a = Math.min(1, 0.15 + tAmp * 0.85).toFixed(3)
-    return `oklch(${l} ${c} 215 / ${a})`
-  }
-  // light mode: deep red trail — warm contrast on ivory
-  const l = (0.55 - tAmp * 0.18).toFixed(3)
+  // deep red trail — warm contrast in both modes
   const c = (0.06 + tAmp * 0.14).toFixed(3)
   const a = Math.min(1, 0.15 + tAmp * 0.85).toFixed(3)
+  if (isDark) {
+    const l = (0.45 + tAmp * 0.22).toFixed(3)
+    return `oklch(${l} ${c} 28 / ${a})`
+  }
+  const l = (0.55 - tAmp * 0.18).toFixed(3)
   return `oklch(${l} ${c} 28 / ${a})`
 }
 
