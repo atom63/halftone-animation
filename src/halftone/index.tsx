@@ -810,12 +810,20 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
+export interface HalftoneReadout {
+  amp: number
+  dots: number
+  freq: number
+}
+
 export interface HalftoneProps {
   /** Backdrop fill for the offscreen bitmap. Default `var(--background)`. */
   canvasCssVar?: string
+  /** Called at ~10 fps with live engine metrics. */
+  onReadout?: (r: HalftoneReadout) => void
 }
 
-export function Halftone({ canvasCssVar = 'var(--background)' }: HalftoneProps = {}) {
+export function Halftone({ canvasCssVar = 'var(--background)', onReadout }: HalftoneProps = {}) {
   const semanticCanvasVarRef = useRef(canvasCssVar)
   semanticCanvasVarRef.current = canvasCssVar
 
@@ -859,6 +867,9 @@ export function Halftone({ canvasCssVar = 'var(--background)' }: HalftoneProps =
   const bgBufferRef = useRef<HTMLCanvasElement | null>(null)
   const bgSizeRef = useRef({ w: 0, h: 0 })
   const panelIdRef = useRef('')
+  const onReadoutRef = useRef(onReadout)
+  onReadoutRef.current = onReadout
+  const lastReadoutWallRef = useRef(0)
 
   // biome-ignore lint/suspicious/noEmptyBlockStatements: initialized before first action fires
   const replayRef = useRef<() => void>(() => {})
@@ -1013,6 +1024,16 @@ export function Halftone({ canvasCssVar = 'var(--background)' }: HalftoneProps =
       }
 
       const wallNow = performance.now() / 1000
+      if (onReadoutRef.current && wallNow - lastReadoutWallRef.current >= 0.1) {
+        lastReadoutWallRef.current = wallNow
+        const cols = Math.ceil(frame.lW / frame.c.grid.spacing) + 2
+        const rows = Math.ceil(frame.lH / frame.c.grid.spacing) + 2
+        onReadoutRef.current({
+          dots: cols * rows,
+          freq: frame.c.structure.coreFreq,
+          amp: Math.abs(Math.sin(frame.t * 1.1) * Math.cos(frame.t * 0.7)),
+        })
+      }
       const cp = cursorPosRef.current
       const tr = c.trail
       compactHoverRipples(
