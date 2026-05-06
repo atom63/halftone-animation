@@ -1,0 +1,40 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: light;
+
+  --background: #ffffff;
+  --foreground: #1c1c1c;
+  --border: rgba(0, 0, 0, 0.1);
+  --muted-foreground: rgba(0, 0, 0, 0.42);
+  --ring: rgba(0, 0, 0, 0.22);
+
+  --header-bg: rgba(255, 255, 255, 0.88);
+  --header-border: rgba(0, 0, 0, 0.07);
+}
+
+html.dark {
+  color-scheme: dark;
+
+  --background: #0a0a0a;
+  --foreground: #f0f0f0;
+  --border: rgba(255, 255, 255, 0.1);
+  --muted-foreground: rgba(255, 255, 255, 0.42);
+  --ring: rgba(255, 255, 255, 0.22);
+
+  --header-bg: rgba(10, 10, 10, 0.88);
+  --header-border: rgba(255, 255, 255, 0.06);
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
